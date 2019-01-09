@@ -21,7 +21,7 @@ Manual Steps For Docler-Build-Image Preparation
    
 4. Login to running container as jenkins user and continue with manual steps
 
-   ssh jenkins@192.168.1.104 -p 37001
+   ssh jenkins@<server-mame> -p 37001
                                           
 ########################### Generate ssh keys for accessing adas repo on server 1 as git user ###############
 
