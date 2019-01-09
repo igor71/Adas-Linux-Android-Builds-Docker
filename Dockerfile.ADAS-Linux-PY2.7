@@ -34,26 +34,25 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
 	build-essential \
     curl \
     wget \
-	vim \
-	git \
+    vim \
+    git \
     git-flow \
-	mercurial \
-	tzdata \
-	pv \
-	zip \
-	unzip \
-	rsync \
-	cifs-utils \
-	iputils-ping \
-	tree \
+    tzdata \
+    pv \
+    zip \
+    unzip \
+    rsync \
+    cifs-utils \
+    iputils-ping \
+    tree \
     net-tools \
-	nano \
-	htop \
-	sudo \
-	nfs-client \
-	nfs-common \
-	pkg-config && \
-	dpkg-reconfigure -f noninteractive tzdata
+    nano \
+    htop \
+    sudo \
+    nfs-client \
+    nfs-common \
+    pkg-config && \
+    dpkg-reconfigure -f noninteractive tzdata
 
 #########################
 #   Installing Cmake    #
@@ -83,9 +82,9 @@ RUN cd /usr/local/src \
 	
 RUN apt-get update && apt-get install -y --no-install-recommends \ 
     python-dev \
-	python-opencv \
-	python-setuptools \
-	python-pytest
+    python-opencv \
+    python-setuptools \
+    python-pytest
 	
 ##############################################
 #    Installing apps for build environment   #
@@ -114,8 +113,8 @@ RUN add-apt-repository -y ppa:openjdk-r/ppa &&\
     apt-get -q update && \
     DEBIAN_FRONTEND="noninteractive" apt-get -q install -y -o Dpkg::Options::="--force-confnew" --no-install-recommends openjdk-8-jre-headless &&\
     apt-get -q clean -y && \
-	rm -rf /var/lib/apt/lists/* && \
-	rm -f /var/cache/apt/*.bin
+    rm -rf /var/lib/apt/lists/* && \
+    rm -f /var/cache/apt/*.bin
    
    	
 ############################################	
@@ -128,7 +127,7 @@ RUN curl -O https://bootstrap.pypa.io/get-pip.py && \
 	
 RUN pip --no-cache-dir install \
     xmltodict \
-	numpy==1.14.5 
+    numpy==1.14.5 
 
 
 ##############################################################
