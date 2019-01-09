@@ -1,0 +1,140 @@
+                     Create Android Build Docker >>> Manual Steps
+
+
+
+##################### Build Docker Images ##################################################################################
+
+a. cd /media/common/USERS/IgorR/YiDocker/dev/devenv/Build/jenkins_slave_docker/Linux-ADAS-Android-Builds/Android
+
+b. docker build -f Dockerfile.ADAS-Android-PY3.6 -t yi/adas-build:0.0 .
+
+c. docker run -d -p 37002:22 --name jenkins-build-android -v /media:/media yi/adas-build:0.0
+
+d. ssh jenkins@server-6 -p 37002
+
+######################### Manual Preparation Steps ########################################################################
+
+
+1. Copy and extract .ssh folder do gain unrestricted access to adas repo on server_1 for git user
+
+   cd ~
+
+   pv /media/common/DOCKER_IMAGES/Tensorflow/Tflow-VNC-Soft/Android/ssh.tar | tar xpf - -C $PWD
+    
+   ssh git@server_1 >> should login without password prompt
+   
+2. ###################### Install ccache ##################################################################################
+
+sudo apt-get update
+
+sudo apt-get install -y ccache
+
+#Increase chache size
+
+ccache -M 10G 
+
+ccache -s
+
+3. ################################### Add Variaables to ./bashrc file ###################################################
+
+nano ~/.bashrc
+
+# better history search (in interactive mode only)
+case "$-" in
+*i*)
+    bind '"\e[A":history-search-backward'
+    bind '"\e[B":history-search-forward'
+esac
+
+export NDK_ROOT=$HOME/devel/android-sdk-linux/ndk-bundle
+export ANDROID_HOME=$HOME/devel/android-sdk-linux
+export PATH=$NDK_ROOT:$ANDROID_HOME/platform-tools:$PATH
+
+export CCACHE_DIR=/usr/src/.ccache
+export CCACHE_HASHDIR=$CCACHE_DIR
+export USE_CCACHE=1
+export NDK_CCACHE=/usr/bin/ccache
+export PATH=/usr/lib/ccache:$PATH
+
+alias vi='vim'
+alias h1='history'
+alias h='history | tail -25'
+alias l='ls -al -G --color=tty'
+alias ll='ls -lh'
+alias ls='ls -G --color=tty'
+alias du='du -h'
+alias df='df -h'
+
+#Close the file and reload it
+
+source ~/.bashrc
+
+4. ################## Installing Android SDK ###############################################
+
+cd devel/
+
+mkdir android-sdk-linux
+
+curl -OSL ftp://jenkins-cloud/pub/Tflow-VNC-Soft/Android/sdk-tools-linux-4333796.zip
+
+cd android-sdk-linux
+
+unzip  ../sdk-tools-linux-4333796.zip
+
+rm ../sdk-tools-linux-4333796.zip
+
+touch ~/.android/repositories.cfg
+
+yes | tools/android list sdk --all
+
+yes | tools/bin/sdkmanager --install "platforms;android-28"
+
+yes | tools/bin/sdkmanager --install "build-tools;28.0.0"
+
+yes | tools/bin/sdkmanager --install "ndk-bundle"
+
+cd ..
+
+5. ################################ Create Soft Link For NDK #################################
+
+ln -s ~/devel/android-sdk-linux/ndk-bundle ~/devel/ndk
+
+####################### Save Docker Image ####################################################
+
+docker ps | grep jenkins-build --->>>> Note docker ID
+
+docker commit <docker-ID> yi/adas-build:android
+
+############################### Perform Test Build #########################################
+
+6. ############################ Clone adas repository ########################################
+
+cd ~/devel
+
+git clone --branch=develop --depth=1 ssh://git@192.168.1.49/media/CODE_CENTRAL/adas
+
+cd adas
+
+git branch >> should be on develop branch
+
+git status
+
+git pull
+
+git submodule update --init --recursive --progress
+
+
+7. #################################### Perform Tests Builds in Manual Mode ###################
+
+cd ~/devel
+
+./gradle_change.sh
+
+cd ~/devel/adas/project/android
+
+./build_fr_demo.sh
+
+./build_fr_sample.sh
+
+
+
