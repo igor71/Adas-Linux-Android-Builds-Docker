@@ -1,7 +1,7 @@
 # Adas-Linux-Android-Builds-Docker
 Jenkins Job >> Create Build Environment For Linux &amp; Android Inside Docker Container
 
-### Creating ADAS Android & Linux Build Docker Images Manually
+### Creating ADAS Linux Build Docker Image Manually
 ```
 git clone --branch=linux --depth=1 github.com/igor71/Adas-Linux-Android-Builds-Docker/
 
