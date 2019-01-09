@@ -3,14 +3,10 @@ Jenkins Job >> Create Build Environment For Linux &amp; Android Inside Docker Co
 
 ### Creating ADAS Android & Linux Build Docker Images Manually
 ```
-git clone --branch=master --depth=1 github.com/igor71/Adas-Linux-Android-Builds-Docker/
+git clone --branch=linux --depth=1 github.com/igor71/Adas-Linux-Android-Builds-Docker/
 
 cd Adas-Linux-Android-Builds-Docker
 
-docker build -f Dockerfile.ADAS-Linux-PY2.7 -t yi/adas-build:0.0 . >> Python 2.7 >> Linux Build (Deprecated)
-
-docker build -f Dockerfile.ADAS-Linux-PY3.6 -t yi/adas-build:0.0 . >> Python 3.6 >> Linux Build
-
-docker build -f Dockerfile.ADAS-Android-PY3.6 -t yi/adas-build:0.0 . >> Android Build
+docker build -f Dockerfile.Python3.6-Build-Linux -t yi/adas-build:linux . >> Python 3.6 >> Linux Build
 ```
-Continue with relevant Manual Steps For Docker-Build... file for rest configuration changes.
+Continue with Auto Steps For Docker-Build... file for test build.
