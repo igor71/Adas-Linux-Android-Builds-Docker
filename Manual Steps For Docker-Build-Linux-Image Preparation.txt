@@ -2,7 +2,7 @@ Manual Steps For Docler-Build-Image Preparation
 
 1. cd /media/common/USERS/IgorR/YiDocker/dev/devenv/Build/jenkins_slave_docker/Linux-ADAS-Android-Builds/Linux
 
-2. docker build -f Dockerfile.ADAS-Linux-PY2.7 -t yi/adas-build:0.0 . >> Python 2.7 >> (Depricated)
+2. docker build -f Dockerfile.ADAS-Linux-PY2.7 -t yi/adas-build:0.0 . >> Python 2.7 >> (Deprecated)
    
    docker build -f Dockerfile.ADAS-Linux-PY3.6 -t yi/adas-build:0.0 . >> Python 3.6
 
