@@ -1,0 +1,172 @@
+Manual Steps For Docler-Build-Image Preparation
+
+1. cd /media/common/USERS/IgorR/YiDocker/dev/devenv/Build/jenkins_slave_docker/Linux-ADAS-Android-Builds/Linux
+
+2. docker build -f Dockerfile.ADAS-Linux-PY2.7 -t yi/adas-build:0.0 . >> Python 2.7 >> (Depricated)
+   
+   docker build -f Dockerfile.ADAS-Linux-PY3.6 -t yi/adas-build:0.0 . >> Python 3.6
+
+3. Build the image and run container:
+
+   docker run -d -p 37001:22 --name jenkins-build-linux -v /media:/media yi/adas-build:0.0
+   
+   Run docker image with preloaded build environment:
+   
+   docker run -d -p 37001:22 --name jenkins-build-linux -v /var/lib/jenkins/workspace/CCACHE/Linux/.ccache/:/usr/src/.ccache -v /var/lib/jenkins/workspace/FR-3.0-linux-valgrind-docker-pipline/:/var/lib/jenkins/workspace/FR-3.0-linux-valgrind-docker-pipline yi/adas-build:0.0
+   
+   OR, for clean build:
+
+   docker run -d -p 37001:22 --name jenkins-build-linux -v /var/lib/jenkins/workspace/CCACHE/Linux/.ccache/:/usr/src/.ccache -v /media:/media yi/adas-build:0.0
+   
+   
+4. Login to running container as jenkins user and continue with manual steps
+
+   ssh jenkins@192.168.1.104 -p 37001
+                                          
+########################### Generate ssh keys for accessing adas repo on server 1 as git user ###############
+
+1. Copy and extract .ssh folder do gain unrestricted access to adas repo on server_1 for git user
+
+   pv /media/common/DOCKER_IMAGES/Tensorflow/Tflow-VNC-Soft/Android/ssh.tar | tar xpf - -C $PWD
+    
+   ssh git@server_1 >> should login without password prompt
+
+***************************************************
+
+Configure Jenkins job to use those keys:
+
+Jenkins -->> Credentials -->> Add Credentials
+
+Choose, the SSH username with private key
+
+Kind: SSH Username with Private Key
+Username – Specify the username that will be used to connect to the remote git repository (git)
+Private Key: 
+Enter directly:
+cat ~/.ssh/git-for-adas
+Passphrase – The passphrase for your key (leave it empty)
+ID – Leave this empty. This is an internal unique ID that are used to identify this credentials in the job. 
+When you leave this empty, Jenkins will auto generate an id.
+Description – Notes
+
+https://www.thegeekstuff.com/2016/10/jenkins-git-setup/
+
+*****************************************************
+
+##############################################################################################################
+
+###################### Install ccache #########################################
+
+sudo apt-get update
+sudo apt-get install -y ccache
+
+#Increase chache size
+
+ccache -M 20G 
+
+ccache -s
+
+#########################################################################################
+
+################################### Add Variaables to ./bashrc file ###################################################
+
+cd ~
+
+nano .bashrc
+
+# better history search (in interactive mode only)
+case "$-" in
+*i*)
+    bind '"\e[A":history-search-backward'
+    bind '"\e[B":history-search-forward'
+esac
+
+export CCACHE_DIR=/usr/src/.ccache
+export CCACHE_HASHDIR=$CCACHE_DIR
+export USE_CCACHE=1
+export PATH=/usr/lib/ccache:$PATH
+
+alias vi='vim'
+alias h1='history'
+alias h='history | tail -25'
+alias l='ls -al -G --color=tty'
+alias ll='ls -lh'
+alias ls='ls -G --color=tty'
+alias du='du -h'
+alias df='df -h'
+
+
+#Close the file and reload it
+
+source ~/.bashrc && echo $PATH
+exit
+
+sudo mv .ccache /usr/src
+
+sudo chmod -R 777 /usr/src/.ccache
+
+source ~/.bashrc
+
+
+##################################### Commit docker after all changes ###################################################
+
+cd ~
+
+docker ps
+
+docker commit < container ID > yi/adas-build:0.1
+
+#########################################################################################################################
+
+
+############################ Clone adas repository into desired working directory ####################################
+
+ssh to node server
+
+cd /var/lib/jenkins/workspace/
+
+mkdir <job_name>
+
+cd <job_name>
+
+git clone --branch=develop --depth=1 ssh://git@192.168.1.49/media/CODE_CENTRAL/adas
+
+cd adas
+
+git branch >> should be on develop branch
+
+git status
+
+git pull
+
+git submodule update --init --recursive
+
+###############################################################################
+
+
+#################################### Perform Tests Builds in Manual Mode ######################################################################################
+
+1. cd ~/devel
+
+2. git clone --branch=develop --depth=1 ssh://git@192.168.1.49/media/CODE_CENTRAL/adas
+
+3. cd adas
+
+4. git submodule update --init --recursive
+
+5. cd ~/devel/adas/project/linux
+
+6. time ./build_fr_demo.sh rebuild debug
+
+7. time ./build_py_libs.sh rebuild-infra
+
+
+#################################################################################################################################################################
+
+
+
+
+
+
+ 
+ 
