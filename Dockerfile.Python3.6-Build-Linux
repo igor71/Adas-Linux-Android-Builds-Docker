@@ -32,29 +32,28 @@ ENV LANGUAGE en_US.UTF-8
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     software-properties-common \
-	build-essential \
+    build-essential \
     curl \
     wget \
-	vim \
-	git \
+    vim \
+    git \
     git-flow \
-	ccache \
-	tzdata \
-	pv \
-	zip \
-	unzip \
-	rsync \
-	cifs-utils \
-	iputils-ping \
-	tree \
+    ccache \
+    tzdata \pv \
+    zip \
+    unzip \
+    rsync \
+    cifs-utils \
+    iputils-ping \
+    tree \
     net-tools \
-	nano \
-	htop \
-	sudo \
-	nfs-client \
-	nfs-common \
-	pkg-config && \
-	dpkg-reconfigure -f noninteractive tzdata
+    nano \
+    htop \
+    sudo \
+    nfs-client \
+    nfs-common \
+    pkg-config && \
+    dpkg-reconfigure -f noninteractive tzdata
 	
 
 #################################################
@@ -64,8 +63,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
 RUN add-apt-repository ppa:jonathonf/python-3.6 && \
     apt-get update && apt-get install -y --no-install-recommends \
     python3.6 \
-	python3.6-dev \
-	python3.6-venv 
+    python3.6-dev \
+    python3.6-venv 
 	
 RUN ln -s /usr/bin/python3.6 /usr/local/bin/python3 && \
     ln -s /usr/local/bin/pip /usr/local/bin/pip3 && \
@@ -88,7 +87,7 @@ RUN cd /usr/local/src \
     && cd cmake-$version.$build \
     && sed -i 's/cmake_options="-DCMAKE_BOOTSTRAP=1"/cmake_options="-DCMAKE_BOOTSTRAP=1 -DCMAKE_USE_OPENSSL=ON"/' bootstrap  \
     && ./bootstrap \
-	&& nc=`nproc` \
+    && nc=`nproc` \
     && make -j$nc \
     &&  make install \
     && cmake --version \
@@ -100,7 +99,7 @@ RUN cd /usr/local/src \
 #################################################
 	
 RUN apt-get update && apt-get install -y --no-install-recommends \ 
-	python3-setuptools 
+    python3-setuptools 
 	
 	
 ##############################################
@@ -132,8 +131,8 @@ RUN add-apt-repository -y ppa:openjdk-r/ppa &&\
     apt-get -q update && \
     DEBIAN_FRONTEND="noninteractive" apt-get -q install -y -o Dpkg::Options::="--force-confnew" --no-install-recommends openjdk-8-jre-headless &&\
     apt-get -q clean -y && \
-	rm -rf /var/lib/apt/lists/* && \
-	rm -f /var/cache/apt/*.bin
+    rm -rf /var/lib/apt/lists/* && \
+    rm -f /var/cache/apt/*.bin
    
    	
 ############################################	
@@ -146,8 +145,8 @@ RUN curl -O https://bootstrap.pypa.io/get-pip.py && \
 	
 RUN python3.6 -m pip --no-cache-dir install \
     xmltodict \
-	numpy \
-	pytest \
+    numpy \
+    pytest \
     opencv-python==3.4.3.18
 	
 
