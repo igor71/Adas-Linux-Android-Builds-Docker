@@ -180,9 +180,9 @@ RUN echo "jenkins  ALL=(ALL)  NOPASSWD: ALL" >> etc/sudoers
 # Set full permission for jenkins folder & setup build folders
 RUN chmod -R 777 /var/lib/jenkins && \
     mkdir -p /var/lib/jenkins/devel && \
-	chown -R jenkins:jenkins /var/lib/jenkins/devel && \
-	mkdir -p /usr/src/.ccache && \
-	chown -R jenkins:jenkins /usr/src/.ccache
+    chown -R jenkins:jenkins /var/lib/jenkins/devel && \
+    mkdir -p /usr/src/.ccache && \
+    chown -R jenkins:jenkins /usr/src/.ccache
 	
 	
 ##################################
@@ -192,22 +192,22 @@ RUN chmod -R 777 /var/lib/jenkins && \
 RUN cd /var/lib/jenkins && \
     curl -OSL ftp://jenkins-cloud/pub/Tflow-VNC-Soft/Android/ssh.tar && \
     pv -f ssh.tar | tar xpf - -C $PWD && \
-	chown -R jenkins:jenkins /var/lib/jenkins/.ssh && \
-	rm ssh.tar 
+    chown -R jenkins:jenkins /var/lib/jenkins/.ssh && \
+    rm ssh.tar 
 	
 COPY bashrc-source.txt /var/lib/jenkins
      
 RUN echo " ">> /var/lib/jenkins/.bashrc && \
     echo "#########################################" >> /var/lib/jenkins/.bashrc && \
-	echo " ">> /var/lib/jenkins/.bashrc && \
+    echo " ">> /var/lib/jenkins/.bashrc && \
     cat /var/lib/jenkins/bashrc-source.txt >> /var/lib/jenkins/.bashrc && \
-	rm /var/lib/jenkins/bashrc-source.txt
+    rm /var/lib/jenkins/bashrc-source.txt
 	
 USER jenkins
 RUN cd /var/lib/jenkins && ccache -M 10G && \
     touch /usr/src/.ccache/ccache.conf && \
-	echo "max_size = 10G" >> /usr/src/.ccache/ccache.conf && \
-	ccache -s
+    echo "max_size = 10G" >> /usr/src/.ccache/ccache.conf && \
+    ccache -s
 USER root	
 
 
