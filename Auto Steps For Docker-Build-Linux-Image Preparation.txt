@@ -1,0 +1,32 @@
+                                     Create Android Build Docker Automatically
+
+
+1. cd /media/common/USERS/IgorR/YiDocker/dev/devenv/Build/jenkins_slave_docker/Linux-ADAS-Android-Builds/Linux
+
+2. docker build -f Dockerfile.Python3.6-Build-Linux -t yi/adas-build:linux .
+
+4. docker run -d -p 37002:22 --name jenkins-build-linux -v /media:/media -v /var/lib/jenkins/workspace/CCACHE/Linux/.ccache/:/usr/src/.ccache yi/adas-build:linux
+
+5. ssh jenkins@server-6 -p 37002
+
+                                     Manual Build Steps
+
+6. cd ~/devel
+
+7. git clone --branch=develop --depth=1 ssh://git@192.168.1.49/media/CODE_CENTRAL/adas
+
+8. cd adas
+
+9. git branch >> should be on develop branch
+
+10. git submodule update --init --recursive
+
+11. cd ~/devel/adas/project/linux
+
+12. time ./build_fr_demo.sh rebuild debug
+
+13. time ./build_py_libs.sh rebuild-infra
+
+
+
+

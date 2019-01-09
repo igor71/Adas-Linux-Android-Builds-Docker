@@ -1,0 +1,245 @@
+# This Dockerfile is used to build an image containing basic stuff to be used as a Jenkins slave Linux build node.
+# This image using python 3.6 by default!!!
+
+FROM ubuntu:16.04
+MAINTAINER Igor Rabkin <igor.rabkin@xiaoyi.com>
+
+
+#################################################
+#          Set Time Zone Asia/Jerusalem         #
+################################################# 
+
+ENV TZ=Asia/Jerusalem
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+
+################################################
+#     Basic desktop environment                #
+################################################
+
+# Locale, language
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y locales
+RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
+locale-gen
+ENV LC_ALL en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+
+
+#################################################
+#     Very basic installations                  #
+#################################################
+
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    software-properties-common \
+	build-essential \
+    curl \
+    wget \
+	vim \
+	git \
+    git-flow \
+	ccache \
+	tzdata \
+	pv \
+	zip \
+	unzip \
+	rsync \
+	cifs-utils \
+	iputils-ping \
+	tree \
+    net-tools \
+	nano \
+	htop \
+	sudo \
+	nfs-client \
+	nfs-common \
+	pkg-config && \
+	dpkg-reconfigure -f noninteractive tzdata
+	
+
+#################################################
+#     Python 3.6 installations for dev          #
+#################################################
+
+RUN add-apt-repository ppa:jonathonf/python-3.6 && \
+    apt-get update && apt-get install -y --no-install-recommends \
+    python3.6 \
+	python3.6-dev \
+	python3.6-venv 
+	
+RUN ln -s /usr/bin/python3.6 /usr/local/bin/python3 && \
+    ln -s /usr/local/bin/pip /usr/local/bin/pip3 && \
+    ln -s /usr/bin/python3.6 /usr/local/bin/python	
+
+	
+#########################
+#   Installing Cmake    #
+#########################
+
+RUN apt-get install -y --no-install-recommends \ 
+    openssl \
+    libssl-dev
+ 
+ARG version=3.13 
+ARG build=2 
+RUN cd /usr/local/src \
+    && wget https://cmake.org/files/v$version/cmake-$version.$build.tar.gz \
+    && tar -xzvf cmake-$version.$build.tar.gz \
+    && cd cmake-$version.$build \
+    && sed -i 's/cmake_options="-DCMAKE_BOOTSTRAP=1"/cmake_options="-DCMAKE_BOOTSTRAP=1 -DCMAKE_USE_OPENSSL=ON"/' bootstrap  \
+    && ./bootstrap \
+	&& nc=`nproc` \
+    && make -j$nc \
+    &&  make install \
+    && cmake --version \
+    rm cmake-$version.$build.tar.gz
+
+
+#################################################
+#     Python installations for dev              #
+#################################################
+	
+RUN apt-get update && apt-get install -y --no-install-recommends \ 
+	python3-setuptools 
+	
+	
+##############################################
+#    Installing apps for build environment   #
+##############################################
+
+RUN dpkg --add-architecture i386 && \
+   apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+   protobuf-compiler \
+   clang-format \
+   zlib1g:i386 \
+   libc6:i386 \
+   libncurses5:i386 \
+   libstdc++6:i386 \
+   libsm6 \
+   libxext6 \
+   file \
+   texinfo \
+   cppcheck \
+   gcc-multilib \   
+   valgrind 
+   
+
+##################################
+# Install JDK 8 (latest edition) #
+##################################
+
+RUN add-apt-repository -y ppa:openjdk-r/ppa &&\
+    apt-get -q update && \
+    DEBIAN_FRONTEND="noninteractive" apt-get -q install -y -o Dpkg::Options::="--force-confnew" --no-install-recommends openjdk-8-jre-headless &&\
+    apt-get -q clean -y && \
+	rm -rf /var/lib/apt/lists/* && \
+	rm -f /var/cache/apt/*.bin
+   
+   	
+############################################	
+# Installing PIP and build environment app #
+############################################
+
+RUN curl -O https://bootstrap.pypa.io/get-pip.py && \
+    python3.6 get-pip.py && \
+    rm get-pip.py
+	
+RUN python3.6 -m pip --no-cache-dir install \
+    xmltodict \
+	numpy \
+	pytest \
+    opencv-python==3.4.3.18
+	
+
+##############################################################
+#                Installing and Configuring SSH              #
+##############################################################
+
+RUN apt-get -q update &&\
+    DEBIAN_FRONTEND="noninteractive" apt-get -q update -y -o Dpkg::Options::="--force-confnew" --no-install-recommends &&\
+    DEBIAN_FRONTEND="noninteractive" apt-get -q install -y -o Dpkg::Options::="--force-confnew" --no-install-recommends openssh-server &&\
+    rm -rf /var/lib/apt/lists/* && rm -f /var/cache/apt/*.bin 
+	
+# SSH login fix. Otherwise user is kicked off after login
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd && \
+    # Preventing double MOTD's mesages shown when login using SSH
+    sed -i "s/UsePAM yes/UsePAM no/" /etc/ssh/sshd_config && \
+    mkdir /var/run/sshd  
+	
+
+#################################
+# Set user jenkins to the image #
+#################################
+
+RUN groupadd -r -g 119 jenkins && \
+    useradd -m -d /var/lib/jenkins -u 112 -g 119 -s /bin/bash jenkins &&\
+    echo "jenkins:jenkins" | chpasswd
+	
+# Add the jenkins user to sudoers
+RUN echo "jenkins  ALL=(ALL)  NOPASSWD: ALL" >> etc/sudoers
+
+# Set full permission for jenkins folder & setup build folders
+RUN chmod -R 777 /var/lib/jenkins && \
+    mkdir -p /var/lib/jenkins/devel && \
+	chown -R jenkins:jenkins /var/lib/jenkins/devel && \
+	mkdir -p /usr/src/.ccache && \
+	chown -R jenkins:jenkins /usr/src/.ccache
+	
+	
+##################################
+# Configure Jenkins User Account #
+##################################
+
+RUN cd /var/lib/jenkins && \
+    curl -OSL ftp://jenkins-cloud/pub/Tflow-VNC-Soft/Android/ssh.tar && \
+    pv -f ssh.tar | tar xpf - -C $PWD && \
+	chown -R jenkins:jenkins /var/lib/jenkins/.ssh && \
+	rm ssh.tar 
+	
+COPY bashrc-source.txt /var/lib/jenkins
+     
+RUN echo " ">> /var/lib/jenkins/.bashrc && \
+    echo "#########################################" >> /var/lib/jenkins/.bashrc && \
+	echo " ">> /var/lib/jenkins/.bashrc && \
+    cat /var/lib/jenkins/bashrc-source.txt >> /var/lib/jenkins/.bashrc && \
+	rm /var/lib/jenkins/bashrc-source.txt
+	
+USER jenkins
+RUN cd /var/lib/jenkins && ccache -M 10G && \
+    touch /usr/src/.ccache/ccache.conf && \
+	echo "max_size = 10G" >> /usr/src/.ccache/ccache.conf && \
+	ccache -s
+USER root	
+
+
+#########################################
+# Add Welcome Message With Instructions #
+#########################################
+
+RUN echo '[ ! -z "$TERM" -a -r /etc/motd ] && cat /etc/issue && cat /etc/motd' \
+	>> /etc/bash.bashrc \
+	; echo "\
+||||||||||||||||||||||||||||||||||||\n\
+|                                  |\n\
+| Docker Container Running Ubuntu  |\n\
+| Using As Linux Build Environment |\n\
+| For ADAS Project                 |\n\
+|                                  |\n\
+||||||||||||||||||||||||||||||||||||\n\
+\n "\
+	> /etc/motd
+
+	
+#####################
+# Standard SSH Port #
+#####################
+
+EXPOSE 22
+
+
+#####################
+# Default command   #
+#####################
+
+CMD ["/usr/sbin/sshd", "-D"]
+RUN ["/bin/bash"]

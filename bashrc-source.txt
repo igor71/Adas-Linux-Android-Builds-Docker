@@ -1,0 +1,20 @@
+# better history search (in interactive mode only)
+case "$-" in
+*i*)
+    bind '"\e[A":history-search-backward'
+    bind '"\e[B":history-search-forward'
+esac
+
+export CCACHE_DIR=/usr/src/.ccache
+export CCACHE_HASHDIR=$CCACHE_DIR
+export USE_CCACHE=1
+export PATH=/usr/lib/ccache:$PATH
+
+alias vi='vim'
+alias h1='history'
+alias h='history | tail -25'
+alias l='ls -al -G --color=tty'
+alias ll='ls -lh'
+alias ls='ls -G --color=tty'
+alias du='du -h'
+alias df='df -h'
