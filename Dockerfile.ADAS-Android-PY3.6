@@ -215,7 +215,8 @@ RUN chmod -R 777 /var/lib/jenkins && \
     mkdir -p /var/lib/jenkins/devel/adas && \
     chown -R jenkins:jenkins /var/lib/jenkins/devel && \
     mkdir -p /usr/src/.ccache && \
-    chown -R jenkins:jenkins /usr/src/.ccache 
+    chown -R jenkins:jenkins /usr/src/.ccache
+COPY gradle_change.sh /var/lib/jenkins/devel
 	
 
 #########################################
