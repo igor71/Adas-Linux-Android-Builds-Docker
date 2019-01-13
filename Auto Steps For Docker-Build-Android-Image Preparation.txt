@@ -14,7 +14,9 @@
 
 3. docker build -f Dockerfile.Python3.6-Build-Android -t yi/adas-build:android .
 
-4. docker run -d -p 37002:22 --name jenkins-build-android -v /media:/media yi/adas-build:android
+4. docker run -d -p 37002:22 --name jenkins-build-linux -v /media:/media -v /var/lib/jenkins/workspace/CCACHE/Android/.ccache/:/usr/src/.ccache yi/adas-build:android
+
+  docker run -d -p 37002:22 --name jenkins-build-android -v /media:/media yi/adas-build:android
 
 5. ssh jenkins@server-6 -p 37002
 
