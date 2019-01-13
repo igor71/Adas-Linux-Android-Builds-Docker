@@ -16,18 +16,18 @@ pipeline {
         }
         stage('Build yi/adas-build:linux Docker Image') {
             steps {
-	              sh 'docker build --no-cache -f Dockerfile.Python3.6-Build-Linux -t yi/adas-build:linux .'  
+	        sh 'docker build --no-cache -f Dockerfile.Python3.6-Build-Linux -t yi/adas-build:linux .'  
             }
         }
 	    stage('Test yi/adas-build:linux Docker Image') { 
             steps {
                 sh '''#!/bin/bash -xe
-		              echo 'Hello, Linux-Build!!'
-                  image_id="$(docker images -q yi/adas-build:linux)"
-                      if [[ "$(docker images -q yi/adas-build:linux 2> /dev/null)" == "$image_id" ]]; then
-                          docker inspect --format='{{range $p, $conf := .RootFS.Layers}} {{$p}} {{end}}' $image_id
+		   echo 'Hello, Linux-Build!!'
+		   image_id="$(docker images -q yi/adas-build:linux)
+		      if [[ "$(docker images -q yi/adas-build:linux 2> /dev/null)" == "$image_id" ]]; then
+		         docker inspect --format='{{range $p, $conf := .RootFS.Layers}} {{$p}} {{end}}' $image_id
                       else
-                          echo "It appears that current docker image corrapted!!!"
+		         echo "It appears that current docker image corrapted!!!"
                       exit 1
                       fi 
                    ''' 
@@ -36,19 +36,19 @@ pipeline {
         stage('Save & Load Docker Image') { 
             steps {
                 sh '''#!/bin/bash -xe
-		              echo 'Saving Docker image into tar archive'
-                  docker save yi/adas-build:linux | pv -f | cat > $WORKSPACE/yi-adas-build-linux.tar
+		echo 'Saving Docker image into tar archive'
+		docker save yi/adas-build:linux | pv -f | cat > $WORKSPACE/yi-adas-build-linux.tar
 				  
-			            echo 'Remove Original Docker Image' 
-			            CURRENT_ID=$(docker images | grep -E '^yi/adas-build.*linux' | awk -e '{print $3}')
-			            docker rmi -f $CURRENT_ID
+	        echo 'Remove Original Docker Image' 
+		CURRENT_ID=$(docker images | grep -E '^yi/adas-build.*linux' | awk -e '{print $3}')
+		docker rmi -f $CURRENT_ID
+				 
+		echo 'Loading Docker Image'
+		pv -f $WORKSPACE/yi-adas-build-linux.tar | docker load
+		docker tag $CURRENT_ID yi/adas-build:linux
 				  
-			            echo 'Loading Docker Image'
-                  pv -f $WORKSPACE/yi-adas-build-linux.tar | docker load
-			            docker tag $CURRENT_ID yi/adas-build:linux
-				  
-                  echo 'Removing temp archive.'  
-                  rm $WORKSPACE/yi-adas-build-linux.tar
+	        echo 'Removing temp archive.'  
+		rm $WORKSPACE/yi-adas-build-linux.tar
                    ''' 
 		    }
 		}
