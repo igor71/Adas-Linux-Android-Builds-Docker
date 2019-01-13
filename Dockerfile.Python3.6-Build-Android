@@ -1,0 +1,148 @@
+# This Dockerfile is used to build an image containing basic stuff to be used as a Jenkins slave Android build node.
+
+FROM yi/adas:python3.6-build
+
+MAINTAINER Igor Rabkin <igor.rabkin@xiaoyi.com>
+
+##################################
+# Install JDK 8 (latest edition) #
+##################################
+
+# This is in accordance to : https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-get-on-ubuntu-16-04
+RUN apt-get update && \
+apt-get install -y openjdk-8-jdk && \
+apt-get clean && \
+rm -rf /var/lib/apt/lists/* && \
+rm -rf /var/cache/oracle-jdk8-installer
+ 
+# Fix certificate issues, found as of 
+# https://bugs.launchpad.net/ubuntu/+source/ca-certificates-java/+bug/983302
+RUN apt-get update && \
+apt-get install -y ca-certificates-java && \
+apt-get clean && \
+update-ca-certificates -f && \
+rm -rf /var/lib/apt/lists/* && \
+rm -rf /var/cache/oracle-jdk8-installer
+   
+   	
+##############################################################
+#                Installing and Configuring SSH              #
+##############################################################
+
+RUN apt-get -q update &&\
+    DEBIAN_FRONTEND="noninteractive" apt-get -q update -y -o Dpkg::Options::="--force-confnew" --no-install-recommends &&\
+    DEBIAN_FRONTEND="noninteractive" apt-get -q install -y -o Dpkg::Options::="--force-confnew" --no-install-recommends openssh-server &&\
+    rm -rf /var/lib/apt/lists/* && rm -f /var/cache/apt/*.bin 
+	
+# SSH login fix. Otherwise user is kicked off after login
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd && \
+    # Preventing double MOTD's mesages shown when login using SSH
+    sed -i "s/UsePAM yes/UsePAM no/" /etc/ssh/sshd_config && \
+    mkdir /var/run/sshd  
+	
+
+#################################
+# Set user jenkins to the image #
+#################################
+
+RUN groupadd -r -g 119 jenkins && \
+    useradd -m -d /var/lib/jenkins -u 112 -g 119 -s /bin/bash jenkins &&\
+    echo "jenkins:jenkins" | chpasswd
+	
+# Add the jenkins user to sudoers
+RUN echo "jenkins  ALL=(ALL)  NOPASSWD: ALL" >> etc/sudoers
+
+# Set full permission for jenkins folder & setup build folders
+RUN chmod -R 777 /var/lib/jenkins && \
+    mkdir -p /var/lib/jenkins/devel && \
+	chown -R jenkins:jenkins /var/lib/jenkins/devel && \
+	mkdir -p /usr/src/.ccache && \
+	chown -R jenkins:jenkins /usr/src/.ccache 
+	
+	
+##################################
+# Configure Jenkins User Account #
+##################################
+
+RUN cd /var/lib/jenkins && \
+    curl -OSL ftp://jenkins-cloud/pub/Tflow-VNC-Soft/Android/ssh.tar && \
+    pv -f ssh.tar | tar xpf - -C $PWD && \
+	chown -R jenkins:jenkins /var/lib/jenkins/.ssh && \
+	rm ssh.tar 
+	
+COPY bashrc-source.txt /var/lib/jenkins
+COPY gradle_change.sh /var/lib/jenkins/devel
+     
+RUN echo " ">> /var/lib/jenkins/.bashrc && \
+    echo "#########################################" >> /var/lib/jenkins/.bashrc && \
+	echo " ">> /var/lib/jenkins/.bashrc && \
+    cat /var/lib/jenkins/bashrc-source.txt >> /var/lib/jenkins/.bashrc && \
+	rm /var/lib/jenkins/bashrc-source.txt
+	
+USER jenkins
+RUN cd /var/lib/jenkins && ccache -M 10G && \
+    touch /usr/src/.ccache/ccache.conf && \
+	echo "max_size = 10G" >> /usr/src/.ccache/ccache.conf && \
+	ccache -s 
+	
+	
+#################################	
+# Installing Android NDK & SDK  #
+#################################
+
+USER root
+
+RUN cd /var/lib/jenkins/devel && \
+    mkdir android-sdk-linux && \
+	curl -OSL ftp://jenkins-cloud/pub/Tflow-VNC-Soft/Android/sdk-tools-linux-4333796.zip && \
+	cd android-sdk-linux && \
+	unzip  ../sdk-tools-linux-4333796.zip && \
+	rm ../sdk-tools-linux-4333796.zip && \
+	mkdir -p /root/.android/ && \
+	touch /root/.android/repositories.cfg && \
+	echo "### User Sources for Android SDK Manager" >> /root/.android/repositories.cfg && \
+	echo "#Fri Nov 03 10:11:27 CET 2017 count=0" >> /root/.android/repositories.cfg && \
+	yes | tools/android list sdk --all && \
+	yes | tools/bin/sdkmanager --install "platforms;android-28" && \
+	yes | tools/bin/sdkmanager --install "build-tools;28.0.0" && \
+	yes | tools/bin/sdkmanager --install "ndk-bundle" && \
+	rm /root/.android/repositories.cfg && \
+	cd .. && \
+	ln -s /var/lib/jenkins/devel/android-sdk-linux/ndk-bundle /var/lib/jenkins/devel/ndk && \
+	chown -R jenkins:jenkins /var/lib/jenkins/devel && \
+	apt-get -q clean -y && \
+	rm -rf /var/lib/apt/lists/* && \
+	rm -f /var/cache/apt/*.bin
+	
+	
+#########################################
+# Add Welcome Message With Instructions #
+#########################################
+
+RUN echo '[ ! -z "$TERM" -a -r /etc/motd ] && cat /etc/issue && cat /etc/motd' \
+	>> /etc/bash.bashrc \
+	; echo "\
+||||||||||||||||||||||||||||||||||||\n\
+|                                  |\n\
+| Docker Container Running Ubuntu  |\n\
+| Using As Build Environment       |\n\
+| For ADAS Android Project         |\n\
+|                                  |\n\
+||||||||||||||||||||||||||||||||||||\n\
+\n "\
+	> /etc/motd
+
+	
+#####################
+# Standard SSH Port #
+#####################
+
+EXPOSE 22
+
+
+#####################
+# Default command   #
+#####################
+
+CMD ["/usr/sbin/sshd", "-D"]
+RUN ["/bin/bash"]
