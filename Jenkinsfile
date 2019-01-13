@@ -1,5 +1,5 @@
 pipeline {
-  agent {label 'yi-tensorflow'}
+  agent {label 'docker-adas-linux'}
     stages {
 	stage('Import Base Docker Image') {
             steps {
