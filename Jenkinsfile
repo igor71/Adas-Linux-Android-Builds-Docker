@@ -1,30 +1,33 @@
 pipeline {
-  agent {label 'docker-adas-linux'}
+  agent {label 'docker-adas-android'}
     stages {
 	stage('Import Base Docker Image') {
             steps {
                 sh '''#!/bin/bash -xe
-                   if test ! -z "$(docker images -q ubuntu:16.04)"; then
+                   if test ! -z "$(docker images -q python:3.6)"; then
                       echo "Docker Image Already Exist!!!"
                    else
-                      pv -f /media/common/DOCKER_IMAGES/Basic/ubuntu-16.04.tar | docker load
-                      docker tag b9e15a5d1e1a ubuntu:16.04
+                      pv -f /media/common/DOCKER_IMAGES/Basic/python-3.6.tar | docker load
+                      docker tag 749d36d00e00 python:3.6
                       echo "DONE!!!"
                    fi
 		            ''' 
             }
         }
-        stage('Build yi/adas-build:linux Docker Image') {
+        stage('Build yi/adas-build:android Docker Image') {
             steps {
-	        sh 'docker build --no-cache -f Dockerfile.Python3.6-Build-Linux -t yi/adas-build:linux .'  
+	        sh '''
+		   docker build --no-cache -f Dockerfile.Python3.6-Build -t yi/adas:python3.6-build .
+		   docker build --no-cache -f Dockerfile.Python3.6-Build-Android -t yi/adas-build:android .
+		   '''
             }
         }
-	    stage('Test yi/adas-build:linux Docker Image') { 
+	    stage('Test yi/adas-build:android Docker Image') { 
             steps {
                 sh '''#!/bin/bash -xe
-		   echo 'Hello, Linux-Build!!'
-		   image_id="$(docker images -q yi/adas-build:linux)"
-		      if [[ "$(docker images -q yi/adas-build:linux 2> /dev/null)" == "$image_id" ]]; then
+		   echo 'Hello, Android-Build!!'
+		   image_id="$(docker images -q yi/adas-build:android)"
+		      if [[ "$(docker images -q yi/adas-build:android 2> /dev/null)" == "$image_id" ]]; then
 		         docker inspect --format='{{range $p, $conf := .RootFS.Layers}} {{$p}} {{end}}' $image_id
                       else
 		         echo "It appears that current docker image corrapted!!!"
@@ -37,18 +40,19 @@ pipeline {
             steps {
                 sh '''#!/bin/bash -xe
 		echo 'Saving Docker image into tar archive'
-		docker save yi/adas-build:linux | pv -f | cat > $WORKSPACE/yi-adas-build-linux.tar
+		docker save yi/adas-build:android | pv -f | cat > $WORKSPACE/yi-adas-build-android.tar
 				  
-	        echo 'Remove Original Docker Image' 
-		CURRENT_ID=$(docker images | grep -E '^yi/adas-build.*linux' | awk -e '{print $3}')
+	        echo 'Remove Original Docker Images' 
+		CURRENT_ID=$(docker images | grep -E '^yi/adas-build.*android' | awk -e '{print $3}')
 		docker rmi -f $CURRENT_ID
+		docker rmi -f yi/adas:python3.6-build
 				 
 		echo 'Loading Docker Image'
-		pv -f $WORKSPACE/yi-adas-build-linux.tar | docker load
-		docker tag $CURRENT_ID yi/adas-build:linux
+		pv -f $WORKSPACE/yi-adas-build-android.tar | docker load
+		docker tag $CURRENT_ID yi/adas-build:android
 				  
 	        echo 'Removing temp archive.'  
-		rm $WORKSPACE/yi-adas-build-linux.tar
+		rm $WORKSPACE/yi-adas-build-android.tar
                    ''' 
 		    }
 		}
