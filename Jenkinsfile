@@ -16,7 +16,7 @@ pipeline {
         }
         stage('Build yi/adas-build:linux Docker Image') {
             steps {
-	        sh 'docker build -f Dockerfile.Python3.6-Build-Linux -t yi/adas-build:linux .'  
+	        sh 'docker build --no-cache -f Dockerfile.Python3.6-Build-Linux -t yi/adas-build:linux .'  
             }
         }
 	    stage('Test yi/adas-build:linux Docker Image') { 
