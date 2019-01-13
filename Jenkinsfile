@@ -46,6 +46,7 @@ pipeline {
 		CURRENT_ID=$(docker images | grep -E '^yi/adas-build.*android' | awk -e '{print $3}')
 		docker rmi -f $CURRENT_ID
 		docker rmi -f yi/adas:python3.6-build
+		docker rmi -f python:3.6
 				 
 		echo 'Loading Docker Image'
 		pv -f $WORKSPACE/yi-adas-build-android.tar | docker load
