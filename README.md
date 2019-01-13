@@ -7,8 +7,8 @@ git clone --branch=android --depth=1 github.com/igor71/Adas-Linux-Android-Builds
 
 cd Adas-Linux-Android-Builds-Docker
 
-docker build -f Dockerfile.Python3.6-Build-Linux -t yi/adas-build:linux .
+docker build -f Dockerfile.Python3.6-Build -t yi/adas:python3.6-build .
 
-docker build -f Dockerfile.Python3.6-Build-Linux -t yi/adas-build:linux .  >> Android Build
+docker build -f Dockerfile.Python3.6-Build-Android -t yi/adas-build:android .  >> Android Build
 ```
 Continue with Auto Steps For Docker-Build... file for test build.
