@@ -34,7 +34,7 @@
 
 11. cd ~/devel
 
-12. ./gradle_change.sh
+12. bash gradle_change.sh
 
 14. cd ~/devel/adas/project/android
 
