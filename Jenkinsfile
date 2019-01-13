@@ -17,7 +17,7 @@ pipeline {
         stage('Build yi/adas-build:android Docker Image') {
             steps {
 	        sh '''
-		   # docker build --no-cache -f Dockerfile.Python3.6-Build -t yi/adas:python3.6-build .
+		   docker build --no-cache -f Dockerfile.Python3.6-Build -t yi/adas:python3.6-build .
 		   docker build --no-cache -f Dockerfile.Python3.6-Build-Android -t yi/adas-build:android .
 		   '''
             }
