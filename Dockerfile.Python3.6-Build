@@ -59,7 +59,13 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
 #     Installing Python Dependencies            #
 #################################################
 
-RUN python -m pip --no-cache-dir install numpy
+RUN python -m pip --no-cache-dir install \
+    numpy \
+    scipy \
+    ipykernel \
+    && \
+    python -m ipykernel.kernelspec 
+   
 
 
 #########################
@@ -83,6 +89,18 @@ RUN cd /usr/local/src \
     &&  make install \
     && cmake --version \
     && cd .. && rm cmake-$version.$build.tar.gz
+    
+    
+#################################################
+#    Install And Update Bazel                   #
+#################################################
+
+RUN mkdir /bazel && \
+    wget -O /bazel/installer.sh "https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh" && \
+    wget -O /bazel/LICENSE.txt "https://raw.githubusercontent.com/bazelbuild/bazel/master/LICENSE" && \
+    chmod +x /bazel/installer.sh && \
+    /bazel/installer.sh && \
+    rm -f /bazel/installer.sh
 
 
 #########################
