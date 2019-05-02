@@ -82,9 +82,22 @@ RUN echo " ">> /var/lib/jenkins/.bashrc && \
 USER jenkins
 RUN cd /var/lib/jenkins && ccache -M 10G && \
     touch /usr/src/.ccache/ccache.conf && \
-	echo "max_size = 10G" >> /usr/src/.ccache/ccache.conf && \
-	ccache -s 
+    echo "max_size = 10G" >> /usr/src/.ccache/ccache.conf && \
+    ccache -s 
 	
+	
+#################################################
+#    Install And Update Bazel                   #
+#################################################
+
+ARG BAZEL_VERSION=0.24.1
+RUN mkdir /bazel && \
+    wget -O /bazel/installer.sh "https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh" && \
+    wget -O /bazel/LICENSE.txt "https://raw.githubusercontent.com/bazelbuild/bazel/master/LICENSE" && \
+    chmod +x /bazel/installer.sh && \
+    /bazel/installer.sh && \
+    rm -f /bazel/installer.sh
+    
 	
 #################################	
 # Installing Android NDK & SDK  #
