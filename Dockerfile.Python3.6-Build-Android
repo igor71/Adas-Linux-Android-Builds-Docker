@@ -86,19 +86,6 @@ RUN cd /var/lib/jenkins && ccache -M 10G && \
     ccache -s 
 	
 	
-#################################################
-#    Install And Update Bazel                   #
-#################################################
-
-ARG BAZEL_VERSION=0.24.1
-RUN mkdir /bazel && \
-    wget -O /bazel/installer.sh "https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh" && \
-    wget -O /bazel/LICENSE.txt "https://raw.githubusercontent.com/bazelbuild/bazel/master/LICENSE" && \
-    chmod +x /bazel/installer.sh && \
-    /bazel/installer.sh && \
-    rm -f /bazel/installer.sh
-    
-	
 #################################	
 # Installing Android NDK & SDK  #
 #################################
@@ -122,10 +109,24 @@ RUN cd /var/lib/jenkins/devel && \
 	rm /root/.android/repositories.cfg && \
 	cd .. && \
 	ln -s /var/lib/jenkins/devel/android-sdk-linux/ndk-bundle /var/lib/jenkins/devel/ndk && \
-	chown -R jenkins:jenkins /var/lib/jenkins/devel && \
-	apt-get -q clean -y && \
-	rm -rf /var/lib/apt/lists/* && \
-	rm -f /var/cache/apt/*.bin
+	chown -R jenkins:jenkins /var/lib/jenkins/devel 
+	
+	
+#################################################
+#    Install And Update Bazel                   #
+#################################################
+
+ARG BAZEL_VERSION=0.24.1
+RUN mkdir /bazel && \
+    wget -O /bazel/installer.sh "https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh" && \
+    wget -O /bazel/LICENSE.txt "https://raw.githubusercontent.com/bazelbuild/bazel/master/LICENSE" && \
+    chmod +x /bazel/installer.sh && \
+    /bazel/installer.sh && \
+    rm -f /bazel/installer.sh
+    && \
+    apt-get -q clean -y && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm -f /var/cache/apt/*.bin
 	
 	
 #########################################
