@@ -1,24 +1,18 @@
                                      Create Android Build Docker Automatically
 
+1. ############### Only if yi-adas-python3.6-build.tar not exist #########################
 
-1. cd /media/common/USERS/IgorR/YiDocker/dev/devenv/Build/jenkins_slave_docker/Linux-ADAS-Android-Builds/Android
+2. git clone --branch=android-tensorflow --depth=1 https://github.com/igor71/Adas-Linux-Android-Builds-Docker
 
-2. 
-  a. pv /media/common/DOCKER_IMAGES/Jenkins-Slaves/yi-adas-python3.6-build.tar | docker load
-
-  b. docker tag 4edb2a66fb05 yi/adas:python3.6-build
-  
-  ############### Only if yi-adas-python3.6-build.tar not exist #########################
-
-  c. docker build -f Dockerfile.Python3.6-Build -t yi/adas:python3.6-build .
-
-3. docker build -f Dockerfile.Python3.6-Build-Android -t yi/adas-build:android .
+   docker build -f Dockerfile.Python3.6-Build -t yi/adas:python3.6-build .
+   
+   docker build -f Dockerfile.Python3.6-Build-Android -t yi/adas-build:android .
 
 4. docker run -it -d --name build-linux-tf -v /media:/media yi/adas:python3.6-build
 
    docker run -it -d --name build-linux-tf -v /media:/media yi/adas-build:android
    
-   yi-dockeradmin build-linux-tf
+5.  yi-dockeradmin build-linux-tf
    
 
                                      Manual Build Steps
