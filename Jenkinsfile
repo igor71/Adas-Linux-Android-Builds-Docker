@@ -26,8 +26,8 @@ pipeline {
             steps {
                 sh '''#!/bin/bash -xe
 		   echo 'Hello, Android-Build!!'
-		   image_id="$(docker images -q yi/adas-build:android)"
-		      if [[ "$(docker images -q yi/adas-build:android 2> /dev/null)" == "$image_id" ]]; then
+		   image_id="$(docker images -q yi/adas-build:android-tensorflow)"
+		      if [[ "$(docker images -q yi/adas-build:android-tensorflow 2> /dev/null)" == "$image_id" ]]; then
 		         docker inspect --format='{{range $p, $conf := .RootFS.Layers}} {{$p}} {{end}}' $image_id
                       else
 		         echo "It appears that current docker image corrapted!!!"
