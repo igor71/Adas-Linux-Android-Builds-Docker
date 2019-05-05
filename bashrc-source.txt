@@ -9,8 +9,6 @@ export NDK_ROOT=$HOME/devel/android-sdk-linux/ndk-bundle
 export ANDROID_HOME=$HOME/devel/android-sdk-linux
 export PATH=$NDK_ROOT:$ANDROID_HOME/platform-tools:$PATH
 
-export NDK_CCACHE=/usr/bin/ccache
-export PATH=/usr/lib/ccache:$PATH
 
 alias vi='vim'
 alias h1='history'
