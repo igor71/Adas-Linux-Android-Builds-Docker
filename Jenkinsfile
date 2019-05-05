@@ -18,7 +18,7 @@ pipeline {
             steps {
 	        sh '''
 		   docker build --no-cache -f Dockerfile.Python3.6-Build -t yi/adas:python3.6-build .
-		   docker build --no-cache -f Dockerfile.Python3.6-Build-Android -t yi/adas-build:android .
+		   docker build --no-cache -f Dockerfile.Python3.6-Build-Android -t yi/adas-build:android-tensorflow .
 		   '''
             }
         }
@@ -40,20 +40,20 @@ pipeline {
             steps {
                 sh '''#!/bin/bash -xe
 		echo 'Saving Docker image into tar archive'
-		docker save yi/adas-build:android | pv -f | cat > $WORKSPACE/yi-adas-build-android.tar
+		docker save yi/adas-build:android-tensorflow | pv -f | cat > $WORKSPACE/yi-adas-build-android-tensorflow.tar
 				  
 	        echo 'Remove Original Docker Images' 
-		CURRENT_ID=$(docker images | grep -E '^yi/adas-build.*android' | awk -e '{print $3}')
+		CURRENT_ID=$(docker images | grep -E '^yi/adas-build.*android-tensorflow' | awk -e '{print $3}')
 		docker rmi -f $CURRENT_ID
 		docker rmi -f yi/adas:python3.6-build
 		docker rmi -f python:3.6
 				 
 		echo 'Loading Docker Image'
-		pv -f $WORKSPACE/yi-adas-build-android.tar | docker load
-		docker tag $CURRENT_ID yi/adas-build:android
+		pv -f $WORKSPACE/yi-adas-build-android-tensorflow.tar | docker load
+		docker tag $CURRENT_ID yi/adas-build:android-tensorlow
 				  
 	        echo 'Removing temp archive.'  
-		rm $WORKSPACE/yi-adas-build-android.tar
+		rm $WORKSPACE/yi-adas-build-android-tensorflow.tar
                    ''' 
 		    }
 		}
