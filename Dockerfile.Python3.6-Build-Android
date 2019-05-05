@@ -9,20 +9,20 @@ MAINTAINER Igor Rabkin <igor.rabkin@xiaoyi.com>
 #   Configure ROOT For TF Build  #
 ##################################	
 
-RUN mkdir -p ~/devel
-COPY bashrc-source.txt ~
-RUN echo " ">> ~/.bashrc && \
-    echo "#########################################" >> ~/.bashrc && \
-	echo " ">> ~/.bashrc && \
-    cat ~/bashrc-source.txt >> ~/.bashrc && \
-	rm ~/bashrc-source.txt
+RUN mkdir -p /root/devel
+COPY bashrc-source.txt /root
+RUN echo " ">> /root/.bashrc && \
+    echo "#########################################" >> /root/.bashrc && \
+	echo " ">> /root/.bashrc && \
+    cat /root/bashrc-source.txt >> /root/.bashrc && \
+	rm /root/bashrc-source.txt
 	
 	
 #################################	
 # Installing Android NDK & SDK  #
 #################################
 
-RUN cd /var/lib/jenkins/devel && \
+RUN cd /root/devel && \
     mkdir android-sdk-linux && \
 	curl -OSL ftp://jenkins-cloud/pub/Tflow-VNC-Soft/Android/sdk-tools-linux-4333796.zip && \
 	cd android-sdk-linux && \
@@ -38,8 +38,8 @@ RUN cd /var/lib/jenkins/devel && \
 	yes | tools/bin/sdkmanager --install "ndk-bundle" && \
 	rm /root/.android/repositories.cfg && \
 	cd .. && \
-	ln -s /var/lib/jenkins/devel/android-sdk-linux/ndk-bundle /var/lib/jenkins/devel/ndk && \
-	chown -R jenkins:jenkins /var/lib/jenkins/devel 
+	ln -s /root/devel/android-sdk-linux/ndk-bundle /root/devel/ndk && \
+	
 	
 	
 #################################################
