@@ -13,9 +13,9 @@ RUN mkdir -p /root/devel
 COPY bashrc-source.txt /root
 RUN echo " ">> /root/.bashrc && \
     echo "#########################################" >> /root/.bashrc && \
-	echo " ">> /root/.bashrc && \
+    echo " ">> /root/.bashrc && \
     cat /root/bashrc-source.txt >> /root/.bashrc && \
-	rm /root/bashrc-source.txt
+    rm /root/bashrc-source.txt
 	
 	
 #################################	
@@ -24,24 +24,23 @@ RUN echo " ">> /root/.bashrc && \
 
 RUN cd /root/devel && \
     mkdir android-sdk-linux && \
-	curl -OSL ftp://jenkins-cloud/pub/Tflow-VNC-Soft/Android/sdk-tools-linux-4333796.zip && \
-	cd android-sdk-linux && \
-	unzip  ../sdk-tools-linux-4333796.zip && \
-	rm ../sdk-tools-linux-4333796.zip && \
-	mkdir -p /root/.android/ && \
-	touch /root/.android/repositories.cfg && \
-	echo "### User Sources for Android SDK Manager" >> /root/.android/repositories.cfg && \
-	echo "#Fri Nov 03 10:11:27 CET 2017 count=0" >> /root/.android/repositories.cfg && \
-	yes | tools/android list sdk --all && \
-	yes | tools/bin/sdkmanager --install "platforms;android-28" && \
-	yes | tools/bin/sdkmanager --install "build-tools;28.0.0" && \
-	yes | tools/bin/sdkmanager --install "ndk-bundle" && \
-	rm /root/.android/repositories.cfg && \
-	cd .. && \
-	ln -s /root/devel/android-sdk-linux/ndk-bundle /root/devel/ndk && \
+    curl -OSL ftp://jenkins-cloud/pub/Tflow-VNC-Soft/Android/sdk-tools-linux-4333796.zip && \
+    cd android-sdk-linux && \
+    unzip  ../sdk-tools-linux-4333796.zip && \
+    rm ../sdk-tools-linux-4333796.zip && \
+    mkdir -p /root/.android/ && \
+    touch /root/.android/repositories.cfg && \
+    echo "### User Sources for Android SDK Manager" >> /root/.android/repositories.cfg && \
+    echo "#Fri Nov 03 10:11:27 CET 2017 count=0" >> /root/.android/repositories.cfg && \
+    yes | tools/android list sdk --all && \
+    yes | tools/bin/sdkmanager --install "platforms;android-28" && \
+    yes | tools/bin/sdkmanager --install "build-tools;28.0.0" && \
+    yes | tools/bin/sdkmanager --install "ndk-bundle" && \
+    rm /root/.android/repositories.cfg && \
+    cd .. && \
+    ln -s /root/devel/android-sdk-linux/ndk-bundle /root/devel/ndk && \
 	
-	
-	
+		
 #################################################
 #    Install And Update Bazel                   #
 #################################################
