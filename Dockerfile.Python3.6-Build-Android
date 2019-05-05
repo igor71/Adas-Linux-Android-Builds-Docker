@@ -35,8 +35,8 @@ RUN cd /root/devel && \
     yes | tools/android list sdk --all && \
     yes | tools/bin/sdkmanager --install "platforms;android-28" && \
     yes | tools/bin/sdkmanager --install "build-tools;28.0.0" && \
-    yes | tools/bin/sdkmanager --install "ndk-bundle" && \
-    rm /root/.android/repositories.cfg && \
+    yes | tools/bin/sdkmanager --install "ndk-bundle"
+RUN rm /root/.android/repositories.cfg && \
     cd .. && \
     ln -s /root/devel/android-sdk-linux/ndk-bundle /root/devel/ndk && \
 	
