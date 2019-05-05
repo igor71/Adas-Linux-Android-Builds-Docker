@@ -22,6 +22,8 @@ RUN echo " ">> /root/.bashrc && \
 # Installing Android NDK & SDK  #
 #################################
 
+SHELL ["/bin/bash", "-c"]
+
 RUN cd /root/devel && \
     mkdir android-sdk-linux && \
 	curl -OSL ftp://jenkins-cloud/pub/Tflow-VNC-Soft/Android/sdk-tools-linux-4333796.zip && \
