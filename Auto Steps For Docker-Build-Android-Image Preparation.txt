@@ -16,7 +16,7 @@
 
 4. docker run -it -d --name build-linux-tf -v /media:/media yi/adas:python3.6-build
 
-   docker run -d -p 37002:22 --name build-linux-tf -v /media:/media yi/adas-build:android
+   docker run -it -d --name build-linux-tf -v /media:/media yi/adas-build:android
 
 5. ssh jenkins@server-6 -p 37002
 
