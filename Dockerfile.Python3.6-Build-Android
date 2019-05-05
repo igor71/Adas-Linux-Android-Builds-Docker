@@ -5,72 +5,22 @@ FROM yi/adas:python3.6-build
 MAINTAINER Igor Rabkin <igor.rabkin@xiaoyi.com>
 
 
-##############################################################
-#                Installing and Configuring SSH              #
-##############################################################
-
-RUN apt-get -q update &&\
-    DEBIAN_FRONTEND="noninteractive" apt-get -q update -y -o Dpkg::Options::="--force-confnew" --no-install-recommends &&\
-    DEBIAN_FRONTEND="noninteractive" apt-get -q install -y -o Dpkg::Options::="--force-confnew" --no-install-recommends openssh-server &&\
-    rm -rf /var/lib/apt/lists/* && rm -f /var/cache/apt/*.bin 
-	
-# SSH login fix. Otherwise user is kicked off after login
-RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd && \
-    # Preventing double MOTD's mesages shown when login using SSH
-    sed -i "s/UsePAM yes/UsePAM no/" /etc/ssh/sshd_config && \
-    mkdir /var/run/sshd  
-	
-
-#################################
-# Set user jenkins to the image #
-#################################
-
-RUN groupadd -r -g 119 jenkins && \
-    useradd -m -d /var/lib/jenkins -u 112 -g 119 -s /bin/bash jenkins &&\
-    echo "jenkins:jenkins" | chpasswd
-	
-# Add the jenkins user to sudoers
-RUN echo "jenkins  ALL=(ALL)  NOPASSWD: ALL" >> etc/sudoers
-
-# Set full permission for jenkins folder & setup build folders
-RUN chmod -R 777 /var/lib/jenkins && \
-    mkdir -p /var/lib/jenkins/devel && \
-	chown -R jenkins:jenkins /var/lib/jenkins/devel && \
-	mkdir -p /usr/src/.ccache && \
-	chown -R jenkins:jenkins /usr/src/.ccache 
-	
-	
 ##################################
-# Configure Jenkins User Account #
-##################################
+#   Configure ROOT For TF Build  #
+##################################	
 
-RUN cd /var/lib/jenkins && \
-    curl -OSL ftp://jenkins-cloud/pub/Tflow-VNC-Soft/Android/ssh.tar && \
-    pv -f ssh.tar | tar xpf - -C $PWD && \
-	chown -R jenkins:jenkins /var/lib/jenkins/.ssh && \
-	rm ssh.tar 
-	
-COPY bashrc-source.txt /var/lib/jenkins
-COPY gradle_change.sh /var/lib/jenkins/devel
-     
-RUN echo " ">> /var/lib/jenkins/.bashrc && \
-    echo "#########################################" >> /var/lib/jenkins/.bashrc && \
-	echo " ">> /var/lib/jenkins/.bashrc && \
-    cat /var/lib/jenkins/bashrc-source.txt >> /var/lib/jenkins/.bashrc && \
-	rm /var/lib/jenkins/bashrc-source.txt
-	
-USER jenkins
-RUN cd /var/lib/jenkins && ccache -M 10G && \
-    touch /usr/src/.ccache/ccache.conf && \
-    echo "max_size = 10G" >> /usr/src/.ccache/ccache.conf && \
-    ccache -s 
+RUN mkdir -p ~/devel
+COPY bashrc-source.txt ~
+RUN echo " ">> ~/.bashrc && \
+    echo "#########################################" >> ~/.bashrc && \
+	echo " ">> ~/.bashrc && \
+    cat ~/bashrc-source.txt >> ~/.bashrc && \
+	rm ~/bashrc-source.txt
 	
 	
 #################################	
 # Installing Android NDK & SDK  #
 #################################
-
-USER root
 
 RUN cd /var/lib/jenkins/devel && \
     mkdir android-sdk-linux && \
@@ -118,9 +68,9 @@ RUN echo '[ ! -z "$TERM" -a -r /etc/motd ] && cat /etc/issue && cat /etc/motd' \
 	; echo "\
 ||||||||||||||||||||||||||||||||||||\n\
 |                                  |\n\
-| Docker Container Running Ubuntu  |\n\
+| Docker Container Running Debian  |\n\
 | Using As Build Environment       |\n\
-| For ADAS Android Project         |\n\
+| For TensorFlow Android Project   |\n\
 |                                  |\n\
 ||||||||||||||||||||||||||||||||||||\n\
 \n "\
@@ -128,15 +78,7 @@ RUN echo '[ ! -z "$TERM" -a -r /etc/motd ] && cat /etc/issue && cat /etc/motd' \
 
 	
 #####################
-# Standard SSH Port #
-#####################
-
-EXPOSE 22
-
-
-#####################
 # Default command   #
 #####################
 
-CMD ["/usr/sbin/sshd", "-D"]
 RUN ["/bin/bash"]
