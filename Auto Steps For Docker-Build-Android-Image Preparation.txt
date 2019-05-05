@@ -17,30 +17,39 @@
 4. docker run -it -d --name build-linux-tf -v /media:/media yi/adas:python3.6-build
 
    docker run -it -d --name build-linux-tf -v /media:/media yi/adas-build:android
-
-5. ssh jenkins@server-6 -p 37002
+   
+   yi-dockeradmin build-linux-tf
+   
 
                                      Manual Build Steps
 
-6. cd ~/devel
+6. git clone --recurse-submodules https://github.com/tensorflow/tensorflow.git
 
-7. git clone --branch=develop --depth=1 ssh://git@192.168.1.49/media/CODE_CENTRAL/adas
+7. cd tensorflow
 
-8. cd adas
+8. bash configure
 
-9. git branch >> should be on develop branch
+9. Please specify the location of python. [Default is /usr/local/bin/python]: -->> [Enter]
 
-10. git submodule update --init --recursive --progress
+10. Found possible Python library paths:
+    /usr/local/lib/python3.6/site-packages
+    Please input the desired Python library path to use.  Default is [/usr/local/lib/python3.6/site-packages] -->> [Enter]
 
-11. cd ~/devel
+11. Do you wish to build TensorFlow with XLA JIT support? [Y/n]: -->> N
 
-12. bash gradle_change.sh
+12. Do you wish to build TensorFlow with OpenCL SYCL support? [y/N]: -->> N
 
-14. cd ~/devel/adas/project/android
+14. Do you wish to build TensorFlow with ROCm support? [y/N]: -->> N
 
-15. time ./build_fr_demo.sh
+15. Do you wish to build TensorFlow with CUDA support? [y/N]: -->> N
 
-16. time ./build_fr_sample.sh
+16. Do you wish to download a fresh release of clang? (Experimental) [y/N]: -->> N
+
+17. Do you wish to build TensorFlow with MPI support? [y/N]: -->> N
+
+18. Please specify optimization flags to use during compilation when bazel option "--config=opt" is specified [Default is -march=native -Wno-sign-compare]: -->> N
+
+19. Would you like to interactively configure ./WORKSPACE for Android builds? [y/N]: -->> Y
 
 
 
