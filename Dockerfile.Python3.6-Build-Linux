@@ -52,6 +52,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     sudo \
     nfs-client \
     nfs-common \
+    dirmngr \
     pkg-config && \
     dpkg-reconfigure -f noninteractive tzdata
 	
