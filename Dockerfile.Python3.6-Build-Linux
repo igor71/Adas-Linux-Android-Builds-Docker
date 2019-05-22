@@ -63,7 +63,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
 
 ENV PYTHON_VERSION=3.6.8
 # If this is called "PIP_VERSION", pip explodes with "ValueError: invalid truth value '<VERSION>'"
-ENV PYTHON_PIP_VERSION 19.1.1
+ENV PYTHON_PIP_VERSION 19.0.3
 # > At the moment, setting "LANG=C" on a Linux system *fundamentally breaks Python 3*, and that's not OK, fixing...
 # http://bugs.python.org/issue19846
 ENV LANG C.UTF-8
@@ -122,9 +122,10 @@ RUN set -ex \
 
 # Make some useful symlinks that are expected to exist
 RUN cd /usr/local/bin \
+        && ln -s idle3 idle \
 	&& ln -s pydoc3 pydoc \
 	&& ln -s python3 python \
-	&& ln -s /usr/local/bin/python3.6 /usr/bin/python3.6 \
+	&& ln -s /usr/local/bin/python3.6 /usr/bin/python3.6.8 \
 	&& ln -s python3-config python-config
 	
 ##################################	
@@ -148,8 +149,8 @@ RUN set -ex; \
 			-o \
 			\( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \
 		\) -exec rm -rf '{}' +; \
-	rm -f get-pip.py	
-
+	rm -f get-pip.py 
+	
 	
 #########################
 #   Installing Cmake    #
