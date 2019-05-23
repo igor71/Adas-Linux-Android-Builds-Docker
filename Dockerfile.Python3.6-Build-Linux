@@ -209,7 +209,7 @@ RUN dpkg --add-architecture i386 && \
 ##################################
 
 RUN apt-get -q update && \
-    apt-get install -y default-jre && \
+    DEBIAN_FRONTEND="noninteractive" apt-get -q install -y -o Dpkg::Options::="--force-confnew" --no-install-recommends default-jre &&\
     apt-get -q clean -y && \
     rm -rf /var/lib/apt/lists/* && \
     rm -f /var/cache/apt/*.bin
