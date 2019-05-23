@@ -208,9 +208,9 @@ RUN dpkg --add-architecture i386 && \
 # Install JDK 8 (latest edition) #
 ##################################
 
-RUN apt-get -q update && \
-    apt-get -q install -y --no-install-recommends -t ca-certificates-java \
-    openjdk-8-jre-headless && \
+RUN echo "deb http://http.debian.net/debian jessie-backports main" > /etc/apt/sources.list.d/jessie-backports.list && \
+    apt-get -q update && \
+    apt-get install -t jessie-backports openjdk-8-jre-headless && \
     apt-get -q clean -y && \
     rm -rf /var/lib/apt/lists/* && \
     rm -f /var/cache/apt/*.bin
