@@ -1,7 +1,7 @@
 # This Dockerfile is used to build an image containing basic stuff to be used as a Jenkins slave Linux build node.
 # This image using python 3.6 by default!!!
 
-FROM buildpack-deps:buster
+FROM ubuntu:18:04
 MAINTAINER Igor Rabkin <igor.rabkin@xiaoyi.com>
 
 
