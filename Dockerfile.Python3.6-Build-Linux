@@ -79,7 +79,7 @@ RUN ln -s /usr/bin/python3.6 /usr/local/bin/python3 && \
    
 RUN apt install python3-pip && \
     pip3 install --upgrade pip && \
-    rm get-pip.py 
+    rm get-pip.py \
     && \ 
     apt-get clean && \ 
     rm -rf /var/lib/apt/lists/*
