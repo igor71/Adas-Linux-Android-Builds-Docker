@@ -39,7 +39,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     git \
     git-flow \
     ccache \
-    tzdata \pv \
+    tzdata \
+    pv \
     zip \
     unzip \
     rsync \
