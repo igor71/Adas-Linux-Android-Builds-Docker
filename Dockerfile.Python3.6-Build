@@ -30,29 +30,30 @@ ENV LANGUAGE en_US.UTF-8
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     software-properties-common \
     build-essential \
-	texinfo \
-        curl \
-        vim \
-	tzdata \
-	pv \
-	rsync \
-	nano \
-	htop \
-	sudo \
-	git \
-	wget \
-	unzip \
-	pkg-config \
-	libswscale-dev \
-	libtbb2 \
-	libtbb-dev \
-	libjpeg-dev \
-	libpng-dev \
-	libtiff-dev \
-	libavformat-dev \
-	libpq-dev \
-	ccache && \
-	dpkg-reconfigure -f noninteractive tzdata
+    texinfo \
+    curl \
+    vim \
+    tzdata \
+    pv \
+    rsync \
+    nano \
+    htop \
+    sudo \
+    git \
+    wget \
+    zip \
+    unzip \
+    pkg-config \
+    libswscale-dev \
+    libtbb2 \
+    libtbb-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libtiff-dev \
+    libavformat-dev \
+    libpq-dev \
+    ccache && \
+    dpkg-reconfigure -f noninteractive tzdata
 	
 
 #################################################
