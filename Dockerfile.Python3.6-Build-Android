@@ -90,6 +90,8 @@ RUN cd /var/lib/jenkins && ccache -M 10G && \
 #    Install And Update Bazel                   #
 #################################################
 
+USER root
+
 ARG BAZEL_VERSION=0.24.1
 RUN mkdir /bazel && \
     wget -O /bazel/installer.sh "https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh" && \
