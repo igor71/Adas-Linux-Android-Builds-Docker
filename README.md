@@ -1,7 +1,7 @@
-# Adas-Linux-Android-Builds-Docker
+# Adas-Linux-TF-Lite-Android-Builds-Docker
 Jenkins Job >> Create Build Environment For Linux &amp; Android Inside Docker Container
 
-### Creating ADAS Android Build Docker Image Manually
+### Creating Tensoflow-Lite Android Build Docker Image Manually
 ```
 git clone --branch=android-tensorflow --depth=1 https://github.com/igor71/Adas-Linux-Android-Builds-Docker
 
