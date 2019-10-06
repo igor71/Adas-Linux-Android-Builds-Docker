@@ -14,7 +14,7 @@
 
 3. docker build -f Dockerfile.Python3.6-Build-Android -t yi/adas-build:android .
 
-4. docker run -d -p 37002:22 --name jenkins-build-linux -v /media:/media -v /var/lib/jenkins/workspace/CCACHE/Android/.ccache/:/usr/src/.ccache yi/adas-build:android
+4. docker run -d -p 37002:22 --name jenkins-build-android -v /media:/media -v /var/lib/jenkins/workspace/CCACHE/Android/.ccache/:/usr/src/.ccache yi/adas-build:android
 
   docker run -d -p 37002:22 --name jenkins-build-android -v /media:/media yi/adas-build:android
 
@@ -24,9 +24,9 @@
 
 6. cd ~/devel
 
-7. git clone --branch=develop --depth=1 ssh://git@192.168.1.49/media/CODE_CENTRAL/adas
+7. git clone --branch=develop --depth=1 ssh://git@server_1/media/CODE_CENTRAL/YiProducts.git
 
-8. cd adas
+8. cd YiProducts
 
 9. git branch >> should be on develop branch
 
@@ -36,7 +36,7 @@
 
 12. bash gradle_change.sh
 
-14. cd ~/devel/adas/project/android
+14. cd ~/devel/YiProducts/project/android
 
 15. time ./build_fr_demo.sh
 
